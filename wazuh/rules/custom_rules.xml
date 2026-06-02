@@ -1,0 +1,72 @@
+<group name="custom,siem,security,">
+
+  <!-- ========================================== -->
+  <!-- Authentication & Brute Force Rules          -->
+  <!-- ========================================== -->
+  <rule id="100001" level="5">
+    <if_sid>5716</if_sid> <!-- Base wazuh rule for SSH authentication failure -->
+    <description>SIEM alert: Multiple failed SSH login attempts detected</description>
+    <group>authentication_failed,syslog,</group>
+  </rule>
+
+  <rule id="100002" level="10" frequency="6" timeframe="120">
+    <if_matched_sid>100001</if_matched_sid>
+    <same_source_ip />
+    <description>SIEM critical: SSH brute force attack detected from IP $(srcip)</description>
+    <group>bruteforce,authentication_failed,syslog,</group>
+  </rule>
+
+  <!-- ========================================== -->
+  <!-- Privilege Escalation & Admin Misuse        -->
+  <!-- ========================================== -->
+  <rule id="100010" level="7">
+    <if_sid>5402</if_sid> <!-- Base wazuh rule for successful sudo run -->
+    <match>COMMAND=/usr/bin/su|COMMAND=/bin/bash|COMMAND=/bin/sh</match>
+    <description>SIEM warning: Sudo session spawned to root shell (su/bash/sh)</description>
+    <group>privilege_escalation,sudo,audit,</group>
+  </rule>
+
+  <rule id="100011" level="9">
+    <if_sid>5403</if_sid> <!-- Sudo execution error/denied -->
+    <description>SIEM alert: Sudo privilege execution denied for user</description>
+    <group>privilege_escalation,sudo_denied,audit,</group>
+  </rule>
+
+  <!-- ========================================== -->
+  <!-- Network Threat & Reconnaissance Detection  -->
+  <!-- ========================================== -->
+  <rule id="100020" level="8">
+    <decoded_as>custom-syslog-parser</decoded_as>
+    <match>portscan|Nmap|SYN Scan</match>
+    <description>SIEM alert: Potential Port scanning signature detected</description>
+    <group>reconnaissance,portscan,firewall,</group>
+  </rule>
+
+  <!-- ========================================== -->
+  <!-- Malware, Shells, and Suspicious Processes  -->
+  <!-- ========================================== -->
+  <rule id="100030" level="12">
+    <if_sid>510</if_sid> <!-- System audit command execution -->
+    <match>nc -e|nc -c|bash -i|/dev/tcp/|sh -i</match>
+    <description>SIEM critical: Reverse shell process spawning command detected</description>
+    <group>malware,reverse_shell,execution,</group>
+  </rule>
+
+  <rule id="100031" level="11">
+    <if_sid>510</if_sid>
+    <match>xmrig|minerd|cgminer|cpuminer</match>
+    <description>SIEM alert: Cryptomining software signature detected on node</description>
+    <group>malware,resource_abuse,cryptomining,</group>
+  </rule>
+
+  <!-- ========================================== -->
+  <!-- System Metrics & Resource Abuse Warnings  -->
+  <!-- ========================================== -->
+  <rule id="100040" level="7">
+    <decoded_as>custom-metrics-parser</decoded_as>
+    <match>CPU_ALERT|RAM_ALERT</match>
+    <description>SIEM warning: Target system resource thresholds exceeded</description>
+    <group>resource_abuse,metrics,</group>
+  </rule>
+
+</group>

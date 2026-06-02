@@ -1,0 +1,35 @@
+filebeat.modules:
+  - module: wazuh
+    alerts:
+      enabled: true
+    archives:
+      enabled: false
+
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /var/ossec/logs/alerts/alerts.json
+    json.keys_under_root: true
+    json.overwrite_keys: true
+
+output.elasticsearch:
+  hosts: ["https://wazuh-indexer:9200"]
+  protocol: "https"
+  username: "admin"
+  password: "admin"
+  ssl.verification_mode: "none"
+  index: "wazuh-alerts-4.x-%{+yyyy.MM.dd}"
+
+setup.template.name: "wazuh"
+setup.template.pattern: "wazuh-alerts-4.x-*"
+setup.template.enabled: false
+setup.template.overwrite: false
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644

@@ -1,0 +1,25 @@
+<!-- Custom Decoders for the SIEM Platform -->
+
+<decoder name="custom-syslog-parser">
+  <program_name>^network-sensor|^firewall</program_name>
+</decoder>
+
+<decoder name="custom-syslog-fields">
+  <parent>custom-syslog-parser</parent>
+  <!-- Match: "firewall: attack detected from IP 192.168.1.100: portscan" -->
+  <prematch>attack detected</prematch>
+  <regex>from IP (\S+): (\S+)</regex>
+  <order>srcip, action</order>
+</decoder>
+
+<decoder name="custom-metrics-parser">
+  <program_name>^system-monitor</program_name>
+</decoder>
+
+<decoder name="custom-metrics-fields">
+  <parent>custom-metrics-parser</parent>
+  <!-- Match: "system-monitor: CPU_ALERT current value: 92%" -->
+  <prematch>current value</prematch>
+  <regex>(\S+) current value: (\S+)</regex>
+  <order>status, extra_data</order>
+</decoder>

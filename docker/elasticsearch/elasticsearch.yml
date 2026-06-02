@@ -1,0 +1,7 @@
+cluster.name: "wazuh-cluster"
+node.name: "wazuh-indexer"
+network.host: 0.0.0.0
+discovery.type: single-node
+
+# Disable security plugin entirely (no SSL, no auth)
+plugins.security.disabled: true

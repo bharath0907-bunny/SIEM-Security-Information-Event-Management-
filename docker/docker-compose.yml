@@ -1,0 +1,132 @@
+services:
+  wazuh-indexer:
+    image: wazuh/wazuh-indexer:4.7.2
+    container_name: wazuh-indexer
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+      - "discovery.type=single-node"
+      - "cluster.name=wazuh-cluster"
+      - "node.name=wazuh-indexer"
+      - "network.host=0.0.0.0"
+      - "plugins.security.disabled=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - wazuh-indexer-data:/var/lib/wazuh-indexer
+      - ./elasticsearch/elasticsearch.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
+    ports:
+      - "9200:9200"
+    networks:
+      - siem-network
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/localhost/9200' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.7.2
+    container_name: wazuh-manager
+    ports:
+      - "1514:1514/tcp"
+      - "1514:1514/udp"
+      - "1515:1515"
+      - "514:514/udp"
+      - "55000:55000"
+    volumes:
+      - wazuh-manager-logs:/var/ossec/logs
+      - wazuh-manager-api:/var/ossec/api/configuration
+      - ../wazuh/ossec.conf:/var/ossec/etc/ossec.conf
+      - ../wazuh/rules/custom_rules.xml:/var/ossec/etc/rules/custom_rules.xml
+      - ../wazuh/decoders/custom_decoders.xml:/var/ossec/etc/decoders/custom_decoders.xml
+    environment:
+      - WAZUH_API_PASSWORD=SecretPassword123!
+      - INDEXER_URL=http://wazuh-indexer:9200
+    depends_on:
+      wazuh-indexer:
+        condition: service_healthy
+    networks:
+      - siem-network
+    healthcheck:
+      test: ["CMD-SHELL", "/var/ossec/bin/wazuh-control status | grep -q 'running' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  wazuh-dashboard:
+    image: wazuh/wazuh-dashboard:4.7.2
+    container_name: wazuh-dashboard
+    ports:
+      - "443:5601"
+    environment:
+      - INDEXER_URL=http://wazuh-indexer:9200
+      - WAZUH_API_URL=https://wazuh-manager:55000
+      - DASHBOARD_USERNAME=kibanaserver
+      - DASHBOARD_PASSWORD=kibanaserver
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
+    depends_on:
+      wazuh-indexer:
+        condition: service_healthy
+    networks:
+      - siem-network
+
+  logstash:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.16.2
+    container_name: logstash
+    ports:
+      - "5044:5044"
+      - "5140:514/udp"
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+    depends_on:
+      wazuh-indexer:
+        condition: service_healthy
+    networks:
+      - siem-network
+
+  siem-ai-engine:
+    build:
+      context: ..
+      dockerfile: docker/siem-ai-engine/Dockerfile
+    container_name: siem-ai-engine
+    volumes:
+      - wazuh-manager-logs:/var/ossec/logs:ro
+      - ../scripts:/app/scripts
+      - ../reports:/app/reports
+    environment:
+      - LOG_FILE_PATH=/var/ossec/logs/alerts/alerts.json
+      - TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
+      - TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHAT_ID
+      - SLACK_WEBHOOK_URL=YOUR_SLACK_WEBHOOK_URL
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your_email@gmail.com
+      - SMTP_PASSWORD=your_app_password
+      - ALERT_RECIPIENT=admin_alert_email@gmail.com
+    depends_on:
+      wazuh-manager:
+        condition: service_healthy
+    networks:
+      - siem-network
+
+volumes:
+  wazuh-indexer-data:
+  wazuh-manager-logs:
+  wazuh-manager-api:
+
+networks:
+  siem-network:
+    driver: bridge

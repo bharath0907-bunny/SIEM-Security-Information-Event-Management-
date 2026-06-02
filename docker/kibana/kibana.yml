@@ -1,0 +1,7 @@
+server.host: "0.0.0.0"
+server.port: 5601
+opensearch.hosts: ["http://wazuh-indexer:9200"]
+
+# Disable security for dashboard (matching indexer security disabled)
+opensearch_security.multitenancy.enabled: false
+opensearch.requestHeadersAllowlist: ["securitytenant","Authorization"]

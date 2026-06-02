@@ -1,0 +1,72 @@
+[
+  {
+    "id": "siem-dashboard-1",
+    "type": "dashboard",
+    "attributes": {
+      "title": "AI-Powered Enterprise SIEM & SOC threat Dashboard",
+      "hits": 0,
+      "description": "Central Security Operations Center dashboard tracking authentication failures, AI anomalies, privilege escalations, and active response bans.",
+      "panelsJSON": "[\n  {\n    \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 24, \"h\": 4, \"i\": \"panel-title\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-title\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-soc-welcome\"\n  },\n  {\n    \"gridData\": {\"x\": 0, \"y\": 4, \"w\": 6, \"h\": 6, \"i\": \"panel-auth-failed\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-auth-failed\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-failed-auths\"\n  },\n  {\n    \"gridData\": {\"x\": 6, \"y\": 4, \"w\": 6, \"h\": 6, \"i\": \"panel-anomalies-count\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-anomalies-count\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-ai-anomalies-total\"\n  },\n  {\n    \"gridData\": {\"x\": 12, \"y\": 4, \"w\": 6, \"h\": 6, \"i\": \"panel-active-bans\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-active-bans\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-active-bans-metric\"\n  },\n  {\n    \"gridData\": {\"x\": 18, \"y\": 4, \"w\": 6, \"h\": 6, \"i\": \"panel-system-health\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-system-health\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-system-metrics\"\n  },\n  {\n    \"gridData\": {\"x\": 0, \"y\": 10, \"w\": 12, \"h\": 10, \"i\": \"panel-alert-severity-pie\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-alert-severity-pie\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-alert-severity-distribution\"\n  },\n  {\n    \"gridData\": {\"x\": 12, \"y\": 10, \"w\": 12, \"h\": 10, \"i\": \"panel-threat-trends-line\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-threat-trends-line\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-threat-timeline-graph\"\n  },\n  {\n    \"gridData\": {\"x\": 0, \"y\": 20, \"w\": 16, \"h\": 12, \"i\": \"panel-alerts-table\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-alerts-table\",\n    \"type\": \"search\",\n    \"id\": \"search-siem-live-alerts\"\n  },\n  {\n    \"gridData\": {\"x\": 16, \"y\": 20, \"w\": 8, \"h\": 12, \"i\": \"panel-attacker-ips\"},\n    \"version\": \"7.17.9\",\n    \"panelIndex\": \"panel-attacker-ips\",\n    \"type\": \"visualization\",\n    \"id\": \"viz-top-attacker-ips-list\"\n  }\n]",
+      "optionsJSON": "{\"useMargins\":true,\"hidePanelTitles\":false}",
+      "timeRestore": true,
+      "timeTo": "now",
+      "timeFrom": "now-24h",
+      "refreshInterval": {
+        "display": "5 seconds",
+        "pause": false,
+        "value": 5000
+      }
+    }
+  },
+  {
+    "id": "viz-failed-auths",
+    "type": "visualization",
+    "attributes": {
+      "title": "Failed SSH Logins",
+      "visState": "{\"title\":\"Failed SSH Logins\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":true,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"labels\",\"style\":{\"fontSize\":48,\"bgWidth\":0.5},\"colorsRange\":[{\"from\":0,\"to\":5},{\"from\":5,\"to\":15},{\"from\":15,\"to\":1000}],\"labels\":{\"show\":true},\"invertColors\":false}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":\"rule.id: 100001 OR rule.id: 100002 OR rule.id: 5716\"},\"label\":\"Authentication Failures\"}]}}]}",
+      "uiStateJSON": "{}",
+      "description": "Counter displaying total count of failed authentication events in the scope."
+    }
+  },
+  {
+    "id": "viz-ai-anomalies-total",
+    "type": "visualization",
+    "attributes": {
+      "title": "AI Model Anomalies Detected",
+      "visState": "{\"title\":\"AI Model Anomalies Detected\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":true,\"colorSchema\":\"Purple to Orange\",\"metricColorMode\":\"labels\",\"style\":{\"fontSize\":48},\"colorsRange\":[{\"from\":0,\"to\":1},{\"from\":1,\"to\":5},{\"from\":5,\"to\":100}],\"labels\":{\"show\":true}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":\"rule.id: 100040 OR anomaly: true\"},\"label\":\"AI Outliers\"}]}}]}",
+      "uiStateJSON": "{}"
+    }
+  },
+  {
+    "id": "viz-active-bans-metric",
+    "type": "visualization",
+    "attributes": {
+      "title": "Active Response Firewall Bans",
+      "visState": "{\"title\":\"Active Response Firewall Bans\",\"type\":\"metric\",\"params\":{\"metric\":{\"style\":{\"fontSize\":48},\"colorsRange\":[{\"from\":0,\"to\":1},{\"from\":1,\"to\":100}]}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\"}]}"
+    }
+  },
+  {
+    "id": "viz-alert-severity-distribution",
+    "type": "visualization",
+    "attributes": {
+      "title": "Threat Distribution by Wazuh Rule Severity",
+      "visState": "{\"title\":\"Threat Distribution\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\"},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"rule.level\",\"size\":10,\"order\":\"desc\"}}]}"
+    }
+  },
+  {
+    "id": "viz-threat-timeline-graph",
+    "type": "visualization",
+    "attributes": {
+      "title": "Security Alerts Frequency Timeline",
+      "visState": "{\"title\":\"Security Alerts Frequency Timeline\",\"type\":\"line\",\"params\":{\"drawLinesBetweenPoints\":true,\"showCircles\":true},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\"},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\"}}]}"
+    }
+  },
+  {
+    "id": "viz-top-attacker-ips-list",
+    "type": "visualization",
+    "attributes": {
+      "title": "Top Offending Attacker IPs",
+      "visState": "{\"title\":\"Top Attacker IPs\",\"type\":\"table\",\"params\":{\"showMatchesCount\":true,\"showTotal\":true},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\"},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.srcip\",\"size\":15,\"order\":\"desc\"}}]}"
+    }
+  }
+]
