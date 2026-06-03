@@ -70,6 +70,8 @@ services:
     environment:
       - INDEXER_URL=http://wazuh-indexer:9200
       - WAZUH_API_URL=https://wazuh-manager:55000
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=SecretPassword123!
       - DASHBOARD_USERNAME=kibanaserver
       - DASHBOARD_PASSWORD=kibanaserver
       - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
@@ -81,46 +83,20 @@ services:
     networks:
       - siem-network
 
-  logstash:
-    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.16.2
-    container_name: logstash
+# logstash service disabled (image unavailable)
+
+  ui:
+    build:
+      context: ../frontend
+    container_name: siem-ui
     ports:
-      - "5044:5044"
-      - "5140:514/udp"
+      - "8080:8080"
     volumes:
-      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-    environment:
-      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
-    depends_on:
-      wazuh-indexer:
-        condition: service_healthy
+      - ../reports:/app/reports:ro
+
     networks:
       - siem-network
 
-  siem-ai-engine:
-    build:
-      context: ..
-      dockerfile: docker/siem-ai-engine/Dockerfile
-    container_name: siem-ai-engine
-    volumes:
-      - wazuh-manager-logs:/var/ossec/logs:ro
-      - ../scripts:/app/scripts
-      - ../reports:/app/reports
-    environment:
-      - LOG_FILE_PATH=/var/ossec/logs/alerts/alerts.json
-      - TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
-      - TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHAT_ID
-      - SLACK_WEBHOOK_URL=YOUR_SLACK_WEBHOOK_URL
-      - SMTP_SERVER=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_USER=your_email@gmail.com
-      - SMTP_PASSWORD=your_app_password
-      - ALERT_RECIPIENT=admin_alert_email@gmail.com
-    depends_on:
-      wazuh-manager:
-        condition: service_healthy
-    networks:
-      - siem-network
 
 volumes:
   wazuh-indexer-data:
