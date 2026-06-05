@@ -45,12 +45,12 @@ services:
       - ../wazuh/rules/custom_rules.xml:/var/ossec/etc/rules/custom_rules.xml
       - ../wazuh/decoders/custom_decoders.xml:/var/ossec/etc/decoders/custom_decoders.xml
       - ../wazuh/shared/ar.conf:/var/ossec/etc/shared/ar.conf
-      - ./wazuh/filebeat.yml:/etc/filebeat/filebeat.yml:ro
     environment:
       - WAZUH_API_PASSWORD=SecretPassword123!
       - INDEXER_URL=https://wazuh-indexer:9200
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=admin
+      - FILEBEAT_SSL_VERIFICATION_MODE=none
     depends_on:
       wazuh-indexer:
         condition: service_healthy
