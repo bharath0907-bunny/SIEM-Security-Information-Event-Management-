@@ -83,24 +83,84 @@ Check the corresponding manuals inside the [docs/](file:///c:/Users/appal/OneDri
 
 ---
 
-## Fast Deployment Sequence
+## Quick Start (First-Time Setup)
 
-Run host setup to configure directories and memory tables:
+> **Prerequisites:** Docker Engine 24+ and Docker Compose v2 installed.
+
+### Step 1 — Clone & configure system limits
+
 ```bash
-chmod +x deployment/setup_env.sh
-sudo ./deployment/setup_env.sh
+git clone <your-repo-url>
+cd SIEM-Security-Information-Event-Management-
+
+# Required for Wazuh Indexer (OpenSearch) memory mapping
+sudo sysctl -w vm.max_map_count=262144
+echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
 ```
 
-Execute Docker Compose to build and start the SIEM stack:
+### Step 2 — Run the one-time setup script
+
 ```bash
 cd docker
-docker compose up --build -d
+chmod +x setup.sh
+bash setup.sh
 ```
 
-Confirm service status:
+This script automatically:
+1. Starts all containers
+2. Initializes the OpenSearch security index (generates admin users)
+3. Waits for the Wazuh Manager to boot
+4. Sets correct API passwords for `wazuh` and `wazuh-wui`
+5. Verifies the API is reachable
+
+> ⚠️ **Only run `setup.sh` once** on a fresh start. If you do `docker compose down -v` (which wipes volumes), run it again.
+
+### Step 3 — Access the services
+
+| Service | URL | Credentials |
+|---|---|---|
+| **Wazuh Dashboard** | http://localhost:5601 | `admin` / `admin` |
+| **Custom SIEM UI** | http://localhost:8080 | — |
+| **Wazuh API** | https://localhost:55000 | `wazuh-wui` / `SecretPassword123!` |
+| **OpenSearch** | https://localhost:9200 | `admin` / `admin` |
+
+---
+
+## Day-to-Day Operations
+
 ```bash
+# Start the stack (after first setup.sh)
+cd docker && docker compose up -d
+
+# Stop without losing data
+docker compose down
+
+# Stop and wipe ALL data (requires re-running setup.sh)
+docker compose down -v
+
+# View logs
+docker compose logs -f wazuh-manager
+docker compose logs -f wazuh-indexer
+docker compose logs -f wazuh-dashboard
+
+# Check service health
 docker compose ps
 ```
+
+---
+
+## Connecting a Wazuh Agent
+
+To start generating real security events, install a Wazuh agent on any Linux machine:
+
+```bash
+# On the target machine (replace <MANAGER_IP> with your host's IP)
+wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.7.2-1_amd64.deb
+sudo WAZUH_MANAGER='<MANAGER_IP>' WAZUH_AGENT_NAME='my-machine' dpkg -i wazuh-agent_4.7.2-1_amd64.deb
+sudo systemctl start wazuh-agent
+```
+
+Agents appear in the Wazuh Dashboard → **Agents** within ~60 seconds.
 
 ---
 
