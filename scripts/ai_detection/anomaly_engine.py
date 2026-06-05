@@ -30,6 +30,7 @@ SCALER_PATH = os.path.join(MODEL_DIR, "scaler.pkl")
 
 # Fallback path for alerts log
 LOG_FILE_PATH = os.environ.get("LOG_FILE_PATH", "/var/ossec/logs/alerts/alerts.json")
+ALERTS_JSON_PATH = os.environ.get("ALERTS_JSON_PATH", os.path.join(PROJECT_ROOT, "reports", "alerts.json"))
 
 class AnomalyEngine:
     def __init__(self):
@@ -104,6 +105,21 @@ class AnomalyEngine:
             cpu_utilization = float(metrics["cpu_utilization"])
         if "ram_utilization" in metrics:
             ram_utilization = float(metrics["ram_utilization"])
+        
+        # Fallback to decode from custom‑metrics-fields status & extra_data
+        status = metrics.get("status", "")
+        extra_data = metrics.get("extra_data", "")
+        if status == "CPU_ALERT" and extra_data:
+            try:
+                cpu_utilization = float(extra_data.replace("%", ""))
+            except Exception:
+                pass
+        elif status == "RAM_ALERT" and extra_data:
+            try:
+                ram_utilization = float(extra_data.replace("%", ""))
+            except Exception:
+                pass
+
         if "bytes" in metrics:
             data_transmitted = float(metrics["bytes"]) / 1024.0 # Convert to KB
             
@@ -136,12 +152,13 @@ class AnomalyEngine:
             rule_desc = alert.get("rule", {}).get("description", "Unknown log event")
             src_ip = alert.get("data", {}).get("srcip", alert.get("srcip", "Unknown IP"))
             agent_name = alert.get("agent", {}).get("name", "SIEM-Manager")
+            timestamp = alert.get("timestamp", datetime.datetime.utcnow().isoformat() + "Z")
             
             print(f"[!] ANOMALY DETECTED | Score: {score:.4f} | Agent: {agent_name} | IP: {src_ip} | Base Event: {rule_desc}")
             
             anomaly_details = {
                 "score": float(score),
-                "timestamp": alert.get("timestamp", datetime.datetime.utcnow().isoformat()),
+                "timestamp": timestamp,
                 "source_ip": src_ip,
                 "agent": agent_name,
                 "base_rule_description": rule_desc,
@@ -157,6 +174,67 @@ class AnomalyEngine:
             
             # Send alert to AlertManager channels
             self.alert_manager.dispatch_anomaly_alert(anomaly_details)
+
+            # Format and write AI Anomaly Alert to the Dashboard JSON
+            alert_item = {
+                "severity": "critical" if score < -0.15 else "high",
+                "agent": agent_name,
+                "ip": src_ip,
+                "event": f"AI ANOMALY: {rule_desc}",
+                "timestamp": timestamp,
+                "anomaly_score": float(score),
+                "features": anomaly_details["extracted_features"]
+            }
+            self.write_alert_to_dashboard(alert_item)
+
+        else:
+            rule = alert.get("rule", {})
+            rule_level = int(rule.get("level", 0))
+            if rule_level >= 8:
+                rule_desc = rule.get("description", "Unknown log event")
+                src_ip = alert.get("data", {}).get("srcip", alert.get("srcip", "Unknown IP"))
+                agent_name = alert.get("agent", {}).get("name", "SIEM-Manager")
+                timestamp = alert.get("timestamp", datetime.datetime.utcnow().isoformat() + "Z")
+                
+                print(f"[*] Ingesting High-Level Alert | Level: {rule_level} | Agent: {agent_name} | IP: {src_ip} | Event: {rule_desc}")
+                
+                # Format and write High Severity Alert to the Dashboard JSON
+                alert_item = {
+                    "severity": "critical" if rule_level >= 12 else "high",
+                    "agent": agent_name,
+                    "ip": src_ip,
+                    "event": rule_desc,
+                    "timestamp": timestamp,
+                    "rule_level": rule_level
+                }
+                self.write_alert_to_dashboard(alert_item)
+
+    def write_alert_to_dashboard(self, alert_item):
+        """Appends alert to the dashboard JSON file atomically, capping historical count to 100."""
+        try:
+            os.makedirs(os.path.dirname(ALERTS_JSON_PATH), exist_ok=True)
+            alerts_list = []
+            if os.path.exists(ALERTS_JSON_PATH):
+                try:
+                    with open(ALERTS_JSON_PATH, 'r') as f:
+                        alerts_list = json.load(f)
+                        if not isinstance(alerts_list, list):
+                            alerts_list = []
+                except Exception:
+                    alerts_list = []
+            
+            # Prepend new alert (newest first)
+            alerts_list.insert(0, alert_item)
+            # Cap at 100 entries
+            alerts_list = alerts_list[:100]
+            
+            # Atomic write
+            temp_path = ALERTS_JSON_PATH + ".tmp"
+            with open(temp_path, 'w') as f:
+                json.dump(alerts_list, f, indent=2)
+            os.replace(temp_path, ALERTS_JSON_PATH)
+        except Exception as e:
+            print(f"[ERR] Failed to write alert to dashboard file: {e}")
 
     def tail_log_file(self):
         """Continuously tails the logs output path in real-time."""

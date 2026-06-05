@@ -93,8 +93,28 @@ services:
     container_name: siem-ui
     ports:
       - "8080:8080"
+    environment:
+      - ALERTS_FILE=/app/reports/alerts.json
     volumes:
       - ../reports:/app/reports:ro
+    networks:
+      - siem-network
+
+  siem-ai-engine:
+    build:
+      context: ..
+      dockerfile: docker/siem-ai-engine/Dockerfile
+    container_name: siem-ai-engine
+    volumes:
+      - wazuh-manager-logs:/var/ossec/logs:ro
+      - ../reports:/app/reports
+      - ../scripts:/app/scripts:ro
+    environment:
+      - LOG_FILE_PATH=/var/ossec/logs/alerts/alerts.json
+      - ALERTS_JSON_PATH=/app/reports/alerts.json
+    depends_on:
+      wazuh-manager:
+        condition: service_healthy
     networks:
       - siem-network
 

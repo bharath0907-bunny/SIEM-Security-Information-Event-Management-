@@ -3,23 +3,178 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIEM Alert Dashboard</title>
+  <title>Enterprise AI-SIEM Threat Center</title>
+  <!-- Google Fonts: Outfit (modern sans) and Share Tech Mono (futuristic tech feel) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <header>
-    <h1>SIEM Alert Dashboard</h1>
-    <button id="themeToggle">Toggle Dark/Light</button>
+<body class="dark-theme">
+  <!-- Interactive Canvas or Glowing background lines -->
+  <div class="cyber-glow-orb purple-glow"></div>
+  <div class="cyber-glow-orb blue-glow"></div>
+
+  <header class="navbar">
+    <div class="logo-container">
+      <div class="pulse-indicator online"></div>
+      <h1 class="nav-title">AI-SIEM <span class="accent-text">THREAT CENTER</span></h1>
+    </div>
+    <div class="nav-controls">
+      <span class="system-status">Manager: <span class="status-val text-green">ONLINE</span></span>
+      <button id="themeToggle" class="btn btn-secondary">Toggle Theme</button>
+    </div>
   </header>
-  <main id="alertsContainer">
-    <!-- Alert cards will be injected here -->
+
+  <main class="dashboard-container">
+    <!-- Stats Row -->
+    <section class="stats-grid">
+      <div class="stat-card" id="statTotal">
+        <div class="stat-icon icon-blue">📊</div>
+        <div class="stat-details">
+          <p class="stat-label">Total Ingested Alerts</p>
+          <h2 class="stat-value" id="valTotal">0</h2>
+        </div>
+      </div>
+      <div class="stat-card" id="statCritical">
+        <div class="stat-icon icon-red">🚨</div>
+        <div class="stat-details">
+          <p class="stat-label">Critical Alerts</p>
+          <h2 class="stat-value text-red" id="valCritical">0</h2>
+        </div>
+      </div>
+      <div class="stat-card" id="statAnomalies">
+        <div class="stat-icon icon-purple">🧠</div>
+        <div class="stat-details">
+          <p class="stat-label">AI Anomalies Flagged</p>
+          <h2 class="stat-value text-purple" id="valAnomalies">0</h2>
+        </div>
+      </div>
+      <div class="stat-card" id="statAgents">
+        <div class="stat-icon icon-green">🖥️</div>
+        <div class="stat-details">
+          <p class="stat-label">Active Nodes</p>
+          <h2 class="stat-value text-green" id="valAgents">0</h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters & Operations Bar -->
+    <section class="control-panel">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search by IP, Host, or Signature description..." />
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All Events</button>
+        <button class="filter-btn" data-filter="ai">AI Anomalies</button>
+        <button class="filter-btn" data-filter="critical">Critical</button>
+        <button class="filter-btn" data-filter="high">High</button>
+        <button class="filter-btn" data-filter="medium">Medium</button>
+        <button class="filter-btn" data-filter="low">Low</button>
+      </div>
+    </section>
+
+    <!-- Live Grid Container -->
+    <section class="alerts-feed-wrapper">
+      <div class="feed-header">
+        <h2 class="feed-title">Real-Time Event Stream</h2>
+        <div class="feed-sync-indicator">
+          <span class="spinner"></span> Live Polling
+        </div>
+      </div>
+      <div class="alerts-grid" id="alertsContainer">
+        <!-- Alert cards dynamically injected -->
+        <div class="loading-state">
+          <div class="loader"></div>
+          <p>Establishing secure socket pipeline...</p>
+        </div>
+      </div>
+    </section>
   </main>
-  <footer>
-    <p>© 2026 SIEM Project – Real‑time Anomaly Detection</p>
+
+  <!-- Detailed Modal Viewer -->
+  <div class="modal-overlay" id="alertModal">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="modalClose">&times;</button>
+      
+      <div class="modal-header">
+        <div class="badge" id="modalSeverityBadge">CRITICAL</div>
+        <h2 id="modalEventTitle">AI ANOMALY: SSH brute force detection</h2>
+      </div>
+      
+      <div class="modal-body">
+        <div class="modal-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Monitored Host</span>
+            <span class="meta-val" id="modalAgent">Ubuntu-Target-Node</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Offending IP</span>
+            <span class="meta-val tech-font" id="modalIP">192.168.1.105</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Detection Timestamp</span>
+            <span class="meta-val" id="modalTimestamp">2026-06-03, 19:55:00</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Classifier Score</span>
+            <span class="meta-val text-purple tech-font" id="modalScore">N/A</span>
+          </div>
+        </div>
+
+        <!-- Anomaly Features section (hidden unless AI anomaly) -->
+        <div id="anomalyFeatureSection" class="anomaly-features-wrapper">
+          <h3 class="section-subtitle">🧠 ML Outlier Feature Matrix</h3>
+          <div class="feature-bar-grid">
+            <div class="feature-progress-item">
+              <div class="bar-header">
+                <span>CPU Load</span>
+                <span id="featCpu">85%</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar bg-red" id="featCpuBar" style="width: 85%"></div></div>
+            </div>
+            <div class="feature-progress-item">
+              <div class="bar-header">
+                <span>RAM Usage</span>
+                <span id="featRam">72%</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar bg-orange" id="featRamBar" style="width: 72%"></div></div>
+            </div>
+            <div class="feature-progress-item">
+              <div class="bar-header">
+                <span>Network Payload (Volume)</span>
+                <span id="featData">12,500 KB</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar bg-blue" id="featDataBar" style="width: 50%"></div></div>
+            </div>
+            <div class="feature-progress-item">
+              <div class="bar-header">
+                <span>Failed Logins (5 min window)</span>
+                <span id="featFailed">12 attempts</span>
+              </div>
+              <div class="progress-track"><div class="progress-bar bg-purple" id="featFailedBar" style="width: 90%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="raw-log-viewer">
+          <h3 class="section-subtitle">📄 Event JSON Metadata</h3>
+          <pre><code class="tech-font" id="modalRawJson">{}</code></pre>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-danger" id="actionBan">🚨 Trigger Active Response Ban</button>
+        <button class="btn btn-secondary" id="actionDismiss">Dismiss Alert</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2026 Enterprise AI-SIEM Threat Intelligence Command Center. Running headlessly.</p>
   </footer>
+
   <script src="app.js"></script>
 </body>
 </html>

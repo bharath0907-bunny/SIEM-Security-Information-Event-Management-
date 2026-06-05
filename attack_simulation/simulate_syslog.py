@@ -23,13 +23,13 @@ def main():
     print("======================================================================")
     print("Sending mock syslog alerts to Wazuh UDP port 514...")
 
-    # 1. SSH Brute Force Simulation (10 SSH failed password logs)
-    print("\n[*] Simulating SSH Brute Force Attack (10 attempts)...")
-    for i in range(10):
+    # 1. SSH Brute Force Simulation (15 SSH failed password logs)
+    print("\n[*] Simulating SSH Brute Force Attack (15 attempts)...")
+    for i in range(15):
         # We use a mock attacker IP: 185.190.140.40
         log_msg = f"sshd[12345]: Failed password for root from 185.190.140.40 port 55321 ssh2"
         send_syslog(log_msg)
-        time.sleep(0.2)
+        time.sleep(0.4)
 
     # 2. Network Reconnaissance Port Scan Simulation
     print("\n[*] Simulating Reconnaissance Port Scan...")

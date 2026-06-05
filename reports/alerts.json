@@ -1,1 +1,146 @@
-[]
+[
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "Unknown IP",
+    "event": "AI ANOMALY: SIEM warning: Target system resource thresholds exceeded",
+    "timestamp": "2026-06-05T18:57:44.180+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 0,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 96.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "AI ANOMALY: SIEM alert: Potential Port scanning signature detected",
+    "timestamp": "2026-06-05T18:57:44.180+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 15,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 15.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "AI ANOMALY: sshd: authentication failed.",
+    "timestamp": "2026-06-05T18:57:43.780+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 15,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 15.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "AI ANOMALY: sshd: authentication failed.",
+    "timestamp": "2026-06-05T18:57:43.379+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 14,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 15.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "AI ANOMALY: sshd: authentication failed.",
+    "timestamp": "2026-06-05T18:57:42.979+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 13,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 15.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "AI ANOMALY: sshd: authentication failed.",
+    "timestamp": "2026-06-05T18:57:42.578+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 12,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 15.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "AI ANOMALY: sshd: authentication failed.",
+    "timestamp": "2026-06-05T18:57:42.177+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 11,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 15.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "AI ANOMALY: sshd: authentication failed.",
+    "timestamp": "2026-06-05T18:57:41.777+0000",
+    "anomaly_score": -0.1,
+    "features": {
+      "login_hour": 18.0,
+      "login_duration": 60.0,
+      "failed_attempts_5m": 10,
+      "data_transmitted_kb": 100.0,
+      "cpu_utilization": 15.0,
+      "ram_utilization": 40.0
+    }
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "sshd: brute force trying to get access to the system. Authentication failed.",
+    "timestamp": "2026-06-05T18:57:40.175+0000",
+    "rule_level": 10
+  },
+  {
+    "severity": "high",
+    "agent": "a2fe6cb2c3c3",
+    "ip": "185.190.140.40",
+    "event": "SIEM alert: Potential Port scanning signature detected",
+    "timestamp": "2026-06-05T18:55:45.831+0000",
+    "rule_level": 8
+  }
+]

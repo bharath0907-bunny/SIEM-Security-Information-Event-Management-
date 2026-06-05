@@ -4,8 +4,8 @@ import json
 
 app = Flask(__name__, static_folder='')
 
-# Path to alerts JSON (shared volume with AI engine)
-ALERTS_FILE = os.path.abspath(os.path.join('..', 'reports', 'alerts.json'))
+# Path to alerts JSON (configurable via env, fallback to relative path for local development)
+ALERTS_FILE = os.environ.get("ALERTS_FILE", os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'reports', 'alerts.json')))
 
 @app.route('/')
 def index():
