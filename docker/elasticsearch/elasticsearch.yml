@@ -3,5 +3,8 @@ node.name: "wazuh-indexer"
 network.host: 0.0.0.0
 discovery.type: single-node
 
-# Disable security plugin entirely (no SSL, no auth)
-plugins.security.disabled: true
+# Security plugin active, but SSL disabled for lab use
+plugins.security.ssl.http.enabled: false
+plugins.security.ssl.transport.enabled: false
+plugins.security.allow_unsafe_democertificates: true
+plugins.security.allow_default_init_securityindex: true
